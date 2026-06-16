@@ -11,15 +11,15 @@ const startServer = async () => {
     try {
         await connectDB();
         app.listen(process.env.PORT, () => {
-            console.log("Server is listening on port 4000");
+            console.log("Server is listening on port ", process.env.PORT);
         });
     } catch (err) {
         console.log("Error when listening to port : \n", err);
     }
 }
 
-startServer();
-
 app.use(express.json());
 
 app.use("/user", userRouter);
+
+startServer();
