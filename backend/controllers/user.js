@@ -76,12 +76,26 @@ export const userSignin = async (req, res) => {
 
         res.json({
             msg: "User Loged in successfully",
+            userId: findUser._id,
             token: token
         });
 
     } catch (err) {
         res.status(500).json({
             msg: "Error in login route",
+            error: err.message
+        });
+    }
+}
+
+//Get all users
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await userModel.find({ _id: { $ne: req.id } }).select("-password");
+        res.json({ users });
+    } catch (err) {
+        return res.status(500).json({
+            msg: "Errors in fecthing the users",
             error: err.message
         });
     }

@@ -18,7 +18,10 @@ const io = new Server(httpServer, {
     }
 });
 
-//cors for express 
+//uploads images
+app.use("/uploads", express.static("uploads"));
+
+//cors for express
 app.use(cors({
     origin: "http://localhost:5173"
 }));
@@ -32,30 +35,46 @@ const onlineUsers = {};
 
 io.on("connection", (socket) => {
     console.log("User is connected = ", socket.id);
+    //sends user online status
+    socket.emit("onlineUsers", {
+        onlineUsers
+    });
 
     //user add in onlineUsers
     socket.on("registerUser", (userId) => {
         onlineUsers[userId] = socket.id;
+
+        //Everyone should know that the registered user is online because after we do onlineUsers[userId] = socket.id; then we add new connected user id into onlineUsers object
+        io.emit("onlineUsers", {
+            onlineUsers
+        });
         console.log("All connected users = ", onlineUsers);
+
     });
 
     //message save to DB
     socket.on("sendMessage", async (data) => {
         try {
-            await messageModel.create({
+            const responseData = await messageModel.create({
                 content: data.content,
                 senderId: data.senderId,
                 receiverId: data.receiverId
             });
+
+            //Check for online status
+            const receiverSocketId = onlineUsers[responseData.receiverId];
+
+            console.log(onlineUsers);
+
+            //for sender side UI
+            socket.emit("newMessage", responseData);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("newMessage", responseData);
+            }
+
         } catch (err) {
             console.log("Error when saving message to DB");
             return;
-        }
-        //Check for online status
-        const receiverSocketId = onlineUsers[data.receiverId];
-
-        if (receiverSocketId) {
-            io.to(receiverSocketId).emit("newMessage", data);
         }
     });
 
@@ -69,6 +88,11 @@ io.on("connection", (socket) => {
                 break;
             }
         }
+
+        //Frontend should know about the offline status
+        io.emit("onlineUsers", {
+            onlineUsers
+        });
     });
 });
 
