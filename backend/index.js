@@ -34,7 +34,6 @@ app.use("/message", messageRouter);
 const onlineUsers = {};
 
 io.on("connection", (socket) => {
-    console.log("User is connected = ", socket.id);
     //sends user online status
     socket.emit("onlineUsers", {
         onlineUsers
@@ -48,7 +47,6 @@ io.on("connection", (socket) => {
         io.emit("onlineUsers", {
             onlineUsers
         });
-        console.log("All connected users = ", onlineUsers);
 
     });
 
@@ -64,10 +62,9 @@ io.on("connection", (socket) => {
             //Check for online status
             const receiverSocketId = onlineUsers[responseData.receiverId];
 
-            console.log(onlineUsers);
-
-            //for sender side UI
+            //for sender side UI, the below line verifies that the message has been sent successfully
             socket.emit("newMessage", responseData);
+            
             if (receiverSocketId) {
                 io.to(receiverSocketId).emit("newMessage", responseData);
             }
@@ -80,7 +77,6 @@ io.on("connection", (socket) => {
 
 
     socket.on("disconnect", () => {
-        console.log("User is disconnected = ", socket.id);
 
         for (const userId in onlineUsers) {
             if (onlineUsers[userId] === socket.id) {

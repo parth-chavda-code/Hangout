@@ -11,7 +11,7 @@ function AuthPage() {
     //Hooks should be called at the of the function component first
     const navigate = useNavigate();
 
-    const [isLogin, setIsLogin] = useState(true);
+    const [isLogin, setIsLogin] = useState(true);//shows am i on login page or not?
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -35,8 +35,7 @@ function AuthPage() {
         };
 
         let valid = true;
-        if (!isLogin) { // suppose isLogin = true then for here it will turn value into false, it will not run on false conition,
-            // but if isLogin = false then if condtion will !false means converts into true and it runs the if condition, simple !isLogin means we're not on login page
+        if (!isLogin) { // Registration page
 
             //Empty check for Registration page
             if (!name.trim()) {
@@ -79,11 +78,9 @@ function AuthPage() {
         try {
             setLoading(true);
 
-            const response = await axios.post("http://localhost:4000/user/registration", {
+            const response = await axios.post(import.meta.env.VITE_BASE_URL + "/user/registration", {
                 name, email, password
             });
-            //helps to wait this function for 3 seconds so user can see the spinner
-            await new Promise(resolve => setTimeout(resolve, 3000));
 
             toast.success("Registration successful!");
 
@@ -131,13 +128,10 @@ function AuthPage() {
         try {
             setIsLogin(true);
             //axios = calls /user/signin
-            const response = await axios.post("http://localhost:4000/user/signin", {
+            const response = await axios.post(import.meta.env.VITE_BASE_URL + "/user/signin", {
                 email: email,
                 password: password
             });
-
-            //helps to wait this function for 3 seconds so user can see the spinner
-            await new Promise(resolve => setTimeout(resolve, 3000));
 
             console.log("Login Successfully");
             localStorage.setItem("token", response.data.token);

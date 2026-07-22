@@ -16,7 +16,7 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
             if (!selectedUser) return;
 
             const response = await axios.get(
-                `http://localhost:4000/message/getmessage/${selectedUser._id}`,
+                `${import.meta.env.VITE_BASE_URL}/message/getmessage/${selectedUser._id}`,
                 {
                     headers: {
                         token: localStorage.getItem("token"),
@@ -50,7 +50,7 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
             socket.off("newMessage", listener);
         };
     }, [socket, selectedUser]);
-    
+
     // Auto-scroll to bottom when messages update
     useEffect(() => {
         bottom.current?.scrollIntoView({
@@ -65,8 +65,6 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
         // No user selected
         if (!selectedUser) return;
 
-        console.log("Send message");
-
         const data = {
             content: sendMessage,
             senderId: myUserId,
@@ -78,20 +76,20 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
     }
 
     return (
-        <div className="flex-1 flex flex-col bg-gray-100">
+        <div className="flex-1 flex flex-col bg-orange-50">
             {/* Header */}
-            {selectedUser && <div className="h-16 border-b bg-white flex items-center justify-between px-5">
+            {selectedUser && <div className="h-20 bg-white border-b border-orange-100 px-6 flex items-center shadow-sm">
                 {/* User Header */}
                 <div className="flex items-center gap-3">
                     {/* Avatar */}
                     <img
                         src="https://api.dicebear.com/9.x/adventurer/svg?seed=Felix"
-                        className="w-12 h-12 rounded-full"
+                        className="w-14 h-14 rounded-full object-cover"
                     />
 
                     {/* User Name & Status */}
                     <div>
-                        <h2 className="font-semibold">
+                        <h2 className="text-lg font-semibold text-gray-900">
                             {selectedUser?.name}
                         </h2>
 
@@ -103,7 +101,7 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
             </div>}
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-orange-50">
 
                 {
                     // Check if messages exist
@@ -125,18 +123,18 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
                             >
 
                                 <div
-                                    className={`px-4 py-3 rounded-2xl max-w-md shadow-sm ${message.senderId === myUserId
-                                        ? "bg-blue-500 text-white"
-                                        : "bg-white text-black"
+                                    className={`px-5 py-4 rounded-3xl max-w-md shadow-sm ${message.senderId === myUserId
+                                        ? "bg-orange-500 text-white shadow-md"
+                                        : "bg-white text-gray-800 shadow"
                                         }`}
                                 >
                                     {/* for message showing */}
-                                    <p>{message.content}</p>
+                                    <p className="text-[15px] leading-relaxed">{message.content}</p>
 
                                     {/* will show message time */}
                                     <p
-                                        className={`text-[11px] mt-1 ${message.senderId === myUserId
-                                            ? "text-blue-100"
+                                        className={`text-[11px] opacity-70 mt-2 ${message.senderId === myUserId
+                                            ? "text-gray-100"
                                             : "text-gray-400"
                                             }`}
                                     >
@@ -154,7 +152,7 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
                 <input
                     type="text"
                     placeholder="Type a message"
-                    className="flex-1 border rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-blue-400"
+                    className="flex-1 border rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-orange-400"
                     value={sendMessage}
                     onChange={(e) => setSendMessage(e.target.value)}
                     onKeyDown={(e) => {
@@ -164,7 +162,7 @@ function ChatWindow({ selectedUser, socket, onlineUsers, messages, setMessages }
 
                 <button
                     onClick={sendMsg}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 rounded-full transition"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 rounded-full transition"
                 >
                     <IoMdSend />
                 </button>

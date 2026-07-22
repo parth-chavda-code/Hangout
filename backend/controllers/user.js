@@ -2,12 +2,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { userModel } from "../models/User.js";
+import { messageModel } from "../models/Message.js";
 
 //User Registration
 export const userResgistration = async (req, res) => {
     const { name, email, password } = req.body;
-
-
 
     try {
 
@@ -72,7 +71,7 @@ export const userSignin = async (req, res) => {
             _id: findUser._id
         }, process.env.JWT_SECRET, {
             expiresIn: "2h"
-        }) // don't need call dotenv.config in every file just call it in main index.js file
+        }) // don't need to call dotenv.config in every file just call it in main index.js file
 
         res.json({
             msg: "User Loged in successfully",
@@ -92,7 +91,18 @@ export const userSignin = async (req, res) => {
 export const getAllUsers = async (req, res) => {
     try {
         const users = await userModel.find({ _id: { $ne: req.id } }).select("-password");
-        res.json({ users });
+
+        const usersWithLastMessage = await Promise.all(users.map(async (user) => {
+            const lastMessage = await messageModel.findOne({
+                $or: [
+                    { senderId: req.id, receiverId: user._id },
+                    { senderId: user._id, receiverId: req.id }
+                ]
+            }).sort({ createdAt: -1 }).limit(1);
+
+            return { ...user.toObject(), lastMessage: lastMessage || null }
+        }));
+        res.json({ users: usersWithLastMessage });
     } catch (err) {
         return res.status(500).json({
             msg: "Errors in fecthing the users",
