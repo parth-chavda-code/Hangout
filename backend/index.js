@@ -9,9 +9,11 @@ import { messageRouter } from "./routes/message.js";
 import { messageModel } from "./models/Message.js";
 
 dotenv.config();
-
 const app = express();
 const httpServer = createServer(app);
+
+const PORT = process.env.PORT || 4000;
+
 const io = new Server(httpServer, {
     cors: {
         origin: "*"
@@ -95,8 +97,8 @@ io.on("connection", (socket) => {
 const startServer = async () => {
     try {
         await connectDB();
-        httpServer.listen(process.env.PORT, () => {
-            console.log("Server is listening on port ", process.env.PORT);
+        httpServer.listen(PORT, () => {
+            console.log("Server is listening on port ", PORT);
         });
     } catch (err) {
         console.log("Error when listening to port : \n", err);
