@@ -15,6 +15,9 @@ const httpServer = createServer(app);
 const PORT = process.env.PORT || 4000;
 const allowedOrigin = process.env.CLIENT_URL.split(",");
 
+console.log("process.env.CLIENT_URL = ", process.env.CLIENT_URL);
+console.log("Allowed Origin = ", allowedOrigin);
+
 const io = new Server(httpServer, {
     cors: {
         origin: allowedOrigin,
