@@ -13,10 +13,12 @@ const app = express();
 const httpServer = createServer(app);
 
 const PORT = process.env.PORT || 4000;
+const allowedOrigin = process.env.CLIENT_URL.split(",");
 
 const io = new Server(httpServer, {
     cors: {
-        origin: "*"
+        origin: allowedOrigin,
+        // credentials: true, use when we are using cookies not localStorage
     }
 });
 
@@ -25,7 +27,8 @@ app.use("/uploads", express.static("uploads"));
 
 //cors for express
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: allowedOrigin,
+    // credentials: true, use when we are using cookies not localStorage
 }));
 //express routes
 app.use(express.json());
@@ -66,7 +69,7 @@ io.on("connection", (socket) => {
 
             //for sender side UI, the below line verifies that the message has been sent successfully
             socket.emit("newMessage", responseData);
-            
+
             if (receiverSocketId) {
                 io.to(receiverSocketId).emit("newMessage", responseData);
             }
